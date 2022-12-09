@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 import numpy as np
 
 class TxtCreator:
-    def __init__(self):
+    def __init__(self,xPx,yPx):
         self.root_window = tk.Tk()
         self.root_window.iconbitmap("Motif M.ico")
         self.root_window.title("Txt Creator")
@@ -103,6 +103,9 @@ class TxtCreator:
         self.destroy_button.bind("<Button 1>", self.destroy_draw_window)
         self.destroy_button.pack(side="left")
 
+        self.x_px = xPx*8
+        self.y_px = yPx*8
+
 
     def on_closing(self):
         if messagebox.askokcancel("Quit", "Do you want to close the window?\nAny unsaved work will be lost."):
@@ -114,13 +117,13 @@ class TxtCreator:
             self.Toplevel = tk.Toplevel(self.root_window)
             self.Toplevel.iconbitmap("Motif M.ico")
             self.Toplevel.title("Draw Window")
-            toplevel_size = (514,514)
-            toplevel_pos = (int(self.midpoint[0]-self.root_window_size[0]/2+128),int(self.midpoint[1]-self.root_window_size[0]/2-self.taskbar_height+256))
+            toplevel_size = (self.x_px+2,self.y_px+2)
+            toplevel_pos = (int(self.midpoint[0]-toplevel_size[0]/2),int(self.midpoint[1]-self.root_window_size[1]/2-self.taskbar_height))
             self.Toplevel.geometry(f"{toplevel_size[0]}x{toplevel_size[1]}+{toplevel_pos[0]}+{toplevel_pos[1]}")
             self.Toplevel_isOpen = True
 
-            self.canvas = tk.Canvas(self.Toplevel, width = 512, height = 512)
-            self.img_array = np.zeros((512,512))
+            self.canvas = tk.Canvas(self.Toplevel, width = self.x_px, height = self.y_px)
+            self.img_array = np.zeros((self.y_px,self.x_px))
             for i in range(len(self.img_array)):
                 for j in range(len(self.img_array[i])):
                     if (i%8==0) or (j%8==0):
@@ -162,9 +165,9 @@ class TxtCreator:
         if self.Toplevel_isOpen:
             if messagebox.askokcancel("Save","Saving this image to .txt will overwrite previous outputs with unchanged filenames.\nSave anyway?"):
                 with open("TxtCreatorOutput.txt", "w") as output_file:
-                    for i in range(len(self.img_array)):
+                    for i in range(self.y_px):
                         if i%8==1:
-                            for j in range(len(self.img_array)):
+                            for j in range(self.x_px):
                                 if j%8==1:
                                     if self.img_array[i][j] == 255:
                                         output_file.write("#")
@@ -185,4 +188,4 @@ class TxtCreator:
         self.root_window.mainloop()
 
 if __name__ == "__main__":
-    TxtCreator().main()
+    TxtCreator(64,64).main()

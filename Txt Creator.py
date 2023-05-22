@@ -130,19 +130,19 @@ class TxtCreator:
                         self.img_array[i][j] = 255
             self.img = ImageTk.PhotoImage(Image.fromarray(self.img_array))
             self.canvas.create_image(0,0,anchor="nw",image=self.img)
-            self.canvas.bind("<Button-1>",self.on_click)
+            #self.canvas.bind("<Button-1>",self.on_click)
+            self.canvas.bind("<B1-Motion>",self.on_leftclick)
+            self.canvas.bind("<B3-Motion>",self.on_rightclick)
             self.canvas.pack()
 
         self.Toplevel.protocol("WM_DELETE_WINDOW", self.on_closing)
-    
-    def on_click(self,event):
-        print(event.x,event.y)
-        if (event.x%8==0) or (event.y%8==0):
+
+    def on_leftclick(self,event):
+        if (min([event.x,event.y]) < 0) or (max([event.x,event.y]) >= 512) or (event.x%8==0) or (event.y%8==0):
             pass
         else:
             i = int(event.y//8)*8+1
             j = int(event.x//8)*8+1
-            print(i,j)
             if self.img_array[i][j] == 0:
                 for m in range(7):
                     for n in range(7):
@@ -152,7 +152,13 @@ class TxtCreator:
                 self.canvas.create_image(0,0,anchor="nw",image=self.img)
                 self.canvas.update()
 
-            elif self.img_array[i][j] == 255:
+    def on_rightclick(self,event):
+        if (min([event.x,event.y]) < 0) or (max([event.x,event.y]) >= 512) or (event.x%8==0) or (event.y%8==0):
+            pass
+        else:
+            i = int(event.y//8)*8+1
+            j = int(event.x//8)*8+1
+            if self.img_array[i][j] == 255:
                 for m in range(7):
                     for n in range(7):
                         self.img_array[i+m][j+n] = 0
